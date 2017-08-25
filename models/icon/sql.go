@@ -22,13 +22,13 @@ func (_ *Icon) AddIcon(icon Icon, ok *bool) error {
 	if err != nil {
 		return err
 	}
-
+	//}
 	*ok = true
 	return nil
 }
 
 //GetIconById получает аватарку пользователя по его id
-func (_ *Icon) GetIconById(userId int64, resp Icon) error {
+func (_ *Icon) GetIconByUserId(userId int64, icon Icon) error {
 	con, err := sql.Open("mysql", "root:1234@tcp(localhost:32772)/msg")
 	if err != nil {
 		log.Fatalf("Failed to open connection: %v", err)
@@ -36,15 +36,13 @@ func (_ *Icon) GetIconById(userId int64, resp Icon) error {
 	if con == nil {
 		log.Fatalf("User: Connection is nil")
 	}
-	row, err := con.Query(fmt.Sprintf("SELECT %s FROM icon WHERE id = ?", AllFields), userId)
+	row, err := con.Query(fmt.Sprintf("SELECT user_id, user_icon FROM icon WHERE id = ?"), userId)
 	if err != nil {
 		return err
 	}
-	user, err := scanAllFields(row)
-	if err != nil {
-		return err
+	for row.Next() {
+		err = row.Scan(&icon.UserId, &icon.UserIcon)
 	}
-	resp = *user
 	return nil
 }
 
@@ -72,6 +70,24 @@ func (_ *Icon) GetIcons(id int64, resp []Icon) error {
 		icons = append(icons, *icon)
 	}
 	resp = icons
+	return nil
+}
+
+//ChangeIcon получает аватарки пользователей
+func (_ *Icon) ChangeIcon(icon Icon) error {
+
+	con, err := sql.Open("mysql", "root:1234@tcp(localhost:32772)/msg")
+	if err != nil {
+		log.Fatalf("Failed to open connection: %v", err)
+	}
+	if con == nil {
+		log.Fatalf("User: Connection is nil")
+	}
+	stmt, err := con.Prepare("update icon set user_icon=? where user_id=?")
+	_, err = stmt.Exec(*icon.UserIcon, *icon.UserId)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

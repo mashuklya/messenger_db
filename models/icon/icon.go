@@ -53,7 +53,7 @@ func (icon *Icon) checkFields(fields ...string) (bool, []error) {
 func scanAllFields(rows *sql.Rows) (*Icon, error) {
 	icon := new(Icon)
 	icon.allocateMem()
-	err := rows.Scan(icon.Id,
+	err := rows.Scan(
 		icon.Id,
 		icon.UserId,
 		icon.UserIcon,

@@ -27,27 +27,40 @@ func main() {
 	if con == nil {
 		log.Fatalf("User: Connection is nil")
 	}
+	var resp []icon.Icon
 	reply := true
 
 	user := user.User{
-		Login:    newStr("maria"),
-		Name:     newStr("Maria"),
+		Login:    newStr("vasya"),
+		Name:     newStr("Vasya"),
 		LastName: newStr("Terskikh"),
-		Password: newStr("strenght"),
+		Password: newStr("1234"),
 	}
 
 	icon := icon.Icon{
-		UserId:   newIn64(4),
-		UserIcon: newStr("ಠ_ಠ"),
+		UserId:   newIn64(19),
+		UserIcon: newStr("˙ ͜ʟ˙"),
 	}
+	err = user.GetUserByLogin(*user.Login, user)
+	fmt.Println("err AddUser =", err)
 
-	err = user.AddUser(user, &reply)
-	fmt.Println("err =", err)
-
+	if user.Login == nil {
+		err = user.AddUser(user, &reply)
+		fmt.Println("err AddUser =", err)
+	}
 	err = user.GetUserById(2, user)
-	fmt.Println("resp =", *user.Name, *user.LastName)
+	fmt.Println("err GetUserById =", err)
+	fmt.Println("resp GetUserById=", *user.Name, *user.LastName)
 
 	err = icon.AddIcon(icon, &reply)
-	fmt.Println("err =", err)
+	fmt.Println("err AddIcon =", err)
+
+	err = icon.GetIconByUserId(19, icon)
+	fmt.Println("err GetIconByUserId =", err)
+	fmt.Println("resp GetIconByUserId=", *icon.UserIcon, *icon.UserId)
+
+	err = icon.GetIcons(19, resp)
+	fmt.Println("err GetIcons =", err)
+	fmt.Println("resp GetIcons=", resp)
 
 }
