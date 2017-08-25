@@ -1,11 +1,14 @@
 package user
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 )
 
 //Create добавляет нового пользователя в БД
@@ -67,7 +70,13 @@ func (_ *User) GetUserById(id int64, user User) error {
 	for row.Next() {
 		err = row.Scan(&user.Id, &user.Login, &user.Name, &user.LastName)
 	}
-	//resp = *user
+	row, err = con.Query(fmt.Sprintf("SELECT user_icon FROM user WHERE user_id = ?"), id)
+	if err != nil {
+		return err
+	}
+	for row.Next() {
+		err = row.Scan(&user.Icon)
+	}
 	return nil
 }
 
@@ -88,6 +97,44 @@ func (_ *User) GetUserByLogin(login string, user User) error {
 	for row.Next() {
 		err = row.Scan(&user.Id, &user.Login, &user.Name, &user.LastName)
 	}
+	//resp = *user
+	return nil
+}
+func (_ *User) GetUsersByChatId(chats []int64, users *[]int64) error {
+
+	var (
+		buffer bytes.Buffer
+		str    []string
+	)
+	con, err := sql.Open("mysql", "root:1234@tcp(localhost:32772)/msg")
+	if err != nil {
+		log.Fatalf("Failed to open connection: %v", err)
+	}
+	if con == nil {
+		log.Fatalf("User: Connection is nil")
+	}
+
+	for _, id := range chats {
+		str = strconv.FormatInt(id, 10)
+	}
+
+	ids := strings.Join(str, ", ")
+
+	rows, err := con.Query(fmt.Sprintf("SELECT user_id from history_chat where chat_id = ?"), ids)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	usersId := make([]int64, 0)
+	for rows.Next() {
+		var userid int64
+		err = rows.Scan(&userid)
+		if err != nil {
+			return err
+		}
+		usersId = append(usersId, userid)
+	}
+	*users = usersId
 	//resp = *user
 	return nil
 }

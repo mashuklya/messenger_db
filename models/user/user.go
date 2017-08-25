@@ -14,6 +14,7 @@ type (
 		Password *string //There is no in db. Use only for check/set password
 		Name     *string
 		LastName *string
+		Icon     *string
 	}
 )
 

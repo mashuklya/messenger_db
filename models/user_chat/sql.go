@@ -27,7 +27,7 @@ func (_ *UserChat) AddChat(userChat *UserChat, ok *bool) error {
 }
 
 //вывод всех чатов юзера
-func (_ *UserChat) GetChats(user_id string, resp *[]UserChat) error {
+func (_ *UserChat) GetChatsByUserId(user_id string, resp *[]int64) error {
 	con, err := sql.Open("mysql", "root:1234@tcp(localhost:32772)/msg")
 	if err != nil {
 		log.Fatalf("Failed to open connection: %v", err)
@@ -49,7 +49,7 @@ func (_ *UserChat) GetChats(user_id string, resp *[]UserChat) error {
 		}
 		chatsId = append(chatsId, chat)
 	}
-
+	*resp = chatsId
 	return nil
 }
 
