@@ -1,0 +1,6 @@
+{
+      "addr": "localhost:32768",
+      "dbName": "msg",
+      "user": "root",
+      "pass": "1234",
+}
